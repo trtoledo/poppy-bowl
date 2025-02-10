@@ -1,8 +1,9 @@
 // Use the API_URL variable to make fetch requests to the API.
 // Replace the placeholder with your cohort name (ex: 2109-UNF-HY-WEB-PT)
-const cohortName = "YOUR COHORT NAME HERE";
+const cohortName = "2412-FTB-ET-WEB-FT";
 const API_URL = `https://fsa-puppy-bowl.herokuapp.com/api/${cohortName}`;
-
+const state = { players: [], singlePlayer: []};
+const playerContainer = document.querySelector("#players");
 /**
  * Fetches all players from the API.
  * @returns {Object[]} the array of player objects
@@ -10,6 +11,10 @@ const API_URL = `https://fsa-puppy-bowl.herokuapp.com/api/${cohortName}`;
 const fetchAllPlayers = async () => {
   try {
     // TODO
+    const response = await fetch(`${API_URL}/players`);
+    const json = await response.json();
+    state.players = json.data.players
+    return json.data.players;
   } catch (err) {
     console.error("Uh oh, trouble fetching players!", err);
   }
@@ -22,7 +27,11 @@ const fetchAllPlayers = async () => {
  */
 const fetchSinglePlayer = async (playerId) => {
   try {
-    // TODO
+    const response = await fetch(`${API_URL}/players/${playerId}`);
+    const json = await response.json();
+    state.singlePlayer = json.data.player
+    renderSinglePlayer(state.singlePlayer)
+
   } catch (err) {
     console.error(`Oh no, trouble fetching player #${playerId}!`, err);
   }
@@ -77,6 +86,35 @@ const removePlayer = async (playerId) => {
  */
 const renderAllPlayers = (playerList) => {
   // TODO
+  if (!state.players.length){
+    playerContainer.innerHTML = "<span> No Players Yet … </span>"
+  }
+  const singlePlayerArr = playerList.map((player) => {
+    const card = document.createElement("li");
+
+    const playerName = document.createElement("h2");
+    playerName.innerText = player.name;
+
+    const playerId = document.createElement("p");
+    playerId.innerText = `ID: ${player.id}`;
+
+    const playerImg = document.createElement("img");
+    playerImg.src = player.imageUrl;
+    playerImg.alt = `Image of ${player.name}`;
+    
+   const detailsButton = document.createElement("button")
+   detailsButton.textContent = "See details";
+
+  detailsButton.addEventListener("click", async () => {
+    
+    const singlePlayer = await fetchSinglePlayer(player.id);
+
+  })
+  card.append(playerName, playerId, playerImg, detailsButton)
+    return card;
+  })
+  playerContainer.replaceChildren(...singlePlayerArr);
+
 };
 
 /**
@@ -94,6 +132,23 @@ const renderAllPlayers = (playerList) => {
  */
 const renderSinglePlayer = (player) => {
   // TODO
+  const card = document.createElement("li");
+
+  const playerName = document.createElement("h2");
+  playerName.innerText = player.name;
+
+  const playerId = document.createElement("p");
+  playerId.innerText = `ID: ${player.id}`;
+
+  const playerImg = document.createElement("img");
+  playerImg.src = player.imageUrl;
+  playerImg.alt = `Image of ${player.name}`;
+  
+ const detailsButton = document.createElement("button")
+ detailsButton.textContent = "See details";
+ card.append(playerName, playerId, playerImg, detailsButton)
+ playerContainer.replaceChildren(card);
+
 };
 
 /**
